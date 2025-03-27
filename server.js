@@ -1,27 +1,48 @@
-require("dotenv").config();
+// Importing the necessary packages
 const express = require("express");
 const cors = require("cors");
-const { createClient } = require("@supabase/supabase-js");
+const dotenv = require("dotenv");
+const { createClient } = require("@supabase/supabase-js"); // Import Supabase client
 
+// Load environment variables from .env file
+dotenv.config();
+
+// Initialize Express
 const app = express();
-app.use(cors());
-app.use(express.json());
+app.use(express.json()); // Parse JSON data
+app.use(cors()); // Enable Cross-Origin Resource Sharing (CORS)
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
+// Supabase credentials from .env file
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
-app.post("/submit", async (req, res) => {
-  const { company_name, email, contact_person, answers } = req.body;
-
-  const { data, error } = await supabase.from("survey_responses").insert([
-    { company_name, email, contact_person, answers: JSON.stringify(answers) },
-  ]);
-
-  if (error) return res.status(500).json({ error: error.message });
-  res.status(200).json({ message: "Survey submitted successfully", data });
+// Define a basic route
+app.get("/", (req, res) => {
+  res.send("Welcome to the Survey Backend!");
 });
 
-app.listen(5000, () => console.log("Server running on port 5000"));
+// API route to handle form submissions
+app.post("/submit-form", async (req, res) => {
+  const { companyName, email, contactPerson, answers } = req.body; // Extract data from request body
+  
+  // Save data to Supabase (adjust the table name and columns as per your schema)
+  const { data, error } = await supabase
+    .from("survey_responses") // This is the table in Supabase
+    .insert([
+      { company_name: companyName, email: email, contact_person: contactPerson, answers: answers }
+    ]);
 
+  if (error) {
+    return res.status(500).json({ error: "Error inserting data into Supabase", details: error });
+  }
+
+  // Send success response
+  res.status(200).json({ message: "Data successfully submitted!", data });
+});
+
+// Start the server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
