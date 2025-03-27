@@ -15,7 +15,11 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 const app = express();
 
 // Middleware setup
-app.use(cors());  // Enable CORS for all origins (you can restrict it if needed)
+app.use(cors({
+  origin: ['https://a-shai.github.io'], // Allow GitHub Pages domain
+  methods: 'GET,POST',
+  allowedHeaders: 'Content-Type'
+}));  // Enable CORS for all origins (you can restrict it if needed)
 app.use(bodyParser.json());  // Parse incoming JSON requests
 
 // Handle POST request to submit form data
