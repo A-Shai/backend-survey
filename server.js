@@ -1,27 +1,38 @@
+// Importing required modules
 const express = require('express');
 const cors = require('cors');
+const bodyParser = require('body-parser');
+require('dotenv').config(); // Ensure environment variables are loaded
+
 const app = express();
 
-// Allow requests from your GitHub Pages domain (replace with your actual domain)
-app.use(cors({
-  origin: "https://a-shai.github.io",  // Replace with your GitHub Pages URL
-}));
+// Middleware for CORS
+const corsOptions = {
+  origin: 'http://localhost:3000',  // Allow requests from React app on localhost:3000
+  methods: 'GET,POST',              // Allow GET and POST requests
+  allowedHeaders: 'Content-Type',   // Allow the 'Content-Type' header
+};
 
-// Middleware to parse JSON requests
-app.use(express.json());
+app.use(cors(corsOptions));  // Apply CORS settings to all routes
+app.use(bodyParser.json());  // Parse incoming JSON data
 
-// Handle POST requests to /submit-form
-app.post("/submit-form", (req, res) => {
-  const formData = req.body;  // Get the form data sent from the React app
-  console.log("Form Data:", formData);
+// POST endpoint to handle form submission
+app.post('/submit-form', (req, res) => {
+  const { companyName, email, contactPerson, answers, score } = req.body;
 
-  // Process the form data or save it to a database, etc.
+  console.log('Received form data:', req.body);
 
-  res.status(200).send("Form data received successfully");
+  // Here you can save the form data to your database (e.g., Supabase or Firebase)
+
+  // Sending back a response
+  res.json({
+    message: 'Form submitted successfully!',
+    data: { companyName, email, contactPerson, answers, score },
+  });
 });
 
-// Server is listening on port 5000
-const PORT = 5000;
+// Start the server on port 5000 (or any port of your choice)
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
