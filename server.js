@@ -9,8 +9,6 @@ const { createClient } = require('@supabase/supabase-js');
 // Initialize Supabase client
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
-console.log("Using Supabase URL:", supabaseUrl);
-console.log("Using Supabase Key:", supabaseKey);
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Initialize express app
